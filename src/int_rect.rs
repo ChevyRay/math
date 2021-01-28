@@ -1,7 +1,7 @@
 use crate::{int2, Int2};
 use std::fmt;
 use std::hash::Hash;
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, Sub};
 
 #[derive(Default, Copy, Clone, Debug, PartialEq, Hash)]
 #[repr(C)]

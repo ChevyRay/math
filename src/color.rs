@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
-use std::fmt;
 use std::hash::Hash;
 use std::ops::{Add, Div, Mul, Sub};
+use std::fmt::{Display, Formatter};
 
 #[repr(C)]
 #[derive(Default, Copy, Clone, Debug, Eq, PartialEq, Hash)]
@@ -151,6 +151,13 @@ impl Color {
     }
 }
 
+impl Display for Color {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let hex: u32 = (*self).into();
+        write!(f, "{:08x}", hex)
+    }
+}
+
 impl From<u32> for Color {
     #[inline]
     fn from(val: u32) -> Self {
@@ -221,7 +228,7 @@ impl Mul<Color> for Color {
     fn mul(self, other: Self) -> Self {
         let (r1, g1, b1, a1) = self.floats();
         let (r2, g2, b2, a2) = other.floats();
-        Self::rgba_f32(r1 * r2, g1 * g2, b1 * b2, a1 * a1)
+        Self::rgba_f32(r1 * r2, g1 * g2, b1 * b2, a1 * a2)
     }
 }
 
@@ -258,7 +265,7 @@ impl Div<Color> for Color {
     fn div(self, other: Self) -> Self {
         let (r1, g1, b1, a1) = self.floats();
         let (r2, g2, b2, a2) = other.floats();
-        Self::rgba_f32(r1 / r2, g1 / g2, b1 / b2, a1 / a1)
+        Self::rgba_f32(r1 / r2, g1 / g2, b1 / b2, a1 / a2)
     }
 }
 

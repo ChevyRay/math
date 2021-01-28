@@ -1,6 +1,3 @@
-#[macro_use]
-use approx as approx_lib;
-
 #[inline]
 pub fn approx_f32(a: f32, b: f32) -> bool {
     approx::abs_diff_eq!(a, b)

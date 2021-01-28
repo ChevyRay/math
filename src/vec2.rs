@@ -1,4 +1,3 @@
-use crate::Approx;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Neg, Sub};

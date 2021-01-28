@@ -1,7 +1,7 @@
 use crate::{vec2, Vec2};
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Default, Copy, Clone, Debug, PartialEq)]
 #[repr(C)]
