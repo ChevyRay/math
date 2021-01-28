@@ -1,5 +1,5 @@
 use std::f32::consts::PI;
-use std::hash::Hash;
+use std::hash::{Hash, Hasher};
 
 #[repr(C)]
 #[derive(Default, Copy, Clone, PartialEq, PartialOrd)]
@@ -58,5 +58,18 @@ impl Degrees {
     #[inline]
     pub fn approx<T: Into<Radians>>(self, other: T) -> bool {
         other.into().approx(self)
+    }
+}
+
+impl Hash for Radians {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_i32(crate::hash_f32(self.0));
+    }
+}
+
+impl Hash for Degrees {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        let radians: Radians = (*self).into();
+        radians.hash(state);
     }
 }
