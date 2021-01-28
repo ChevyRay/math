@@ -1,0 +1,290 @@
+use crate::{vec2, Vec2};
+use std::fmt;
+use std::hash::{Hash, Hasher};
+use std::ops::{Add, Div, Mul, Neg, Sub};
+
+#[derive(Default, Copy, Clone, Debug, PartialEq)]
+#[repr(C)]
+pub struct Rect {
+    pub x: f32,
+    pub y: f32,
+    pub w: f32,
+    pub h: f32,
+}
+
+#[inline]
+pub fn rect(x: f32, y: f32, w: f32, h: f32) -> Rect {
+    Rect { x, y, w, h }
+}
+
+impl Rect {
+    pub const EMPTY: Self = Self {
+        x: 0.0,
+        y: 0.0,
+        w: 0.0,
+        h: 0.0,
+    };
+
+    #[inline]
+    pub fn new(x: f32, y: f32, w: f32, h: f32) -> Self {
+        rect(x, y, w, h)
+    }
+
+    #[inline]
+    pub fn centered(center: Vec2, w: f32, h: f32) -> Self {
+        rect(center.x - w * 0.5, center.y - h * 0.5, w, h)
+    }
+
+    #[inline]
+    pub fn of_size(w: f32, h: f32) -> Self {
+        rect(0.0, 0.0, w, h)
+    }
+
+    #[inline]
+    pub fn size(&self) -> Vec2 {
+        vec2(self.w, self.h)
+    }
+
+    #[inline]
+    pub fn left(&self) -> f32 {
+        self.x
+    }
+
+    #[inline]
+    pub fn right(&self) -> f32 {
+        self.x + self.w
+    }
+
+    #[inline]
+    pub fn top(&self) -> f32 {
+        self.y
+    }
+
+    #[inline]
+    pub fn bottom(&self) -> f32 {
+        self.y + self.h
+    }
+
+    #[inline]
+    pub fn min_x(&self) -> f32 {
+        self.x.min(self.right())
+    }
+
+    #[inline]
+    pub fn max_x(&self) -> f32 {
+        self.x.max(self.right())
+    }
+
+    #[inline]
+    pub fn min_y(&self) -> f32 {
+        self.y.min(self.bottom())
+    }
+
+    #[inline]
+    pub fn max_y(&self) -> f32 {
+        self.y.max(self.bottom())
+    }
+
+    #[inline]
+    pub fn center_x(&self) -> f32 {
+        self.x + self.w * 0.5
+    }
+
+    #[inline]
+    pub fn center_y(&self) -> f32 {
+        self.y + self.h * 0.5
+    }
+
+    #[inline]
+    pub fn top_left(&self) -> Vec2 {
+        vec2(self.left(), self.top())
+    }
+
+    #[inline]
+    pub fn top_right(&self) -> Vec2 {
+        vec2(self.right(), self.top())
+    }
+
+    #[inline]
+    pub fn bottom_right(&self) -> Vec2 {
+        vec2(self.right(), self.bottom())
+    }
+
+    #[inline]
+    pub fn bottom_left(&self) -> Vec2 {
+        vec2(self.left(), self.bottom())
+    }
+
+    #[inline]
+    pub fn min(&self) -> Vec2 {
+        vec2(self.min_x(), self.min_y())
+    }
+
+    #[inline]
+    pub fn max(&self) -> Vec2 {
+        vec2(self.max_x(), self.max_y())
+    }
+
+    #[inline]
+    pub fn center(&self) -> Vec2 {
+        vec2(self.center_x(), self.center_y())
+    }
+
+    #[inline]
+    pub fn top_center(&self) -> Vec2 {
+        vec2(self.center_x(), self.top())
+    }
+
+    #[inline]
+    pub fn bottom_center(&self) -> Vec2 {
+        vec2(self.center_x(), self.bottom())
+    }
+
+    #[inline]
+    pub fn left_center(&self) -> Vec2 {
+        vec2(self.left(), self.center_y())
+    }
+
+    #[inline]
+    pub fn right_center(&self) -> Vec2 {
+        vec2(self.right(), self.center_y())
+    }
+
+    #[inline]
+    pub fn area(&self) -> f32 {
+        self.w * self.h
+    }
+
+    #[inline]
+    pub fn perimeter(&self) -> f32 {
+        self.w * 2.0 + self.h * 2.0
+    }
+
+    #[inline]
+    pub fn contains(&self, p: Vec2) -> bool {
+        p.x >= self.x && p.y >= self.y && p.x < self.right() && p.y < self.bottom()
+    }
+
+    #[inline]
+    pub fn contains_rect(&self, r: &Rect) -> bool {
+        r.x >= self.x && r.y >= self.y && r.right() <= self.right() && r.bottom() <= self.bottom()
+    }
+
+    #[inline]
+    pub fn overlaps(&self, r: &Self) -> bool {
+        self.x < r.right() && self.y < r.bottom() && self.right() > r.x && self.bottom() > r.y
+    }
+
+    #[inline]
+    pub fn overlap(&self, r: &Self) -> Option<Self> {
+        let min = self.top_left().max(r.top_left());
+        let max = self.bottom_right().min(r.bottom_right());
+        if max.x > min.x && max.y > min.y {
+            Some(rect(min.x, min.y, max.x - min.x, max.y - min.y))
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    pub fn scale_to_fit(&self, outer: &Self) -> Self {
+        let s = (outer.w / self.w).min(outer.h / self.h);
+        let w = self.w * s;
+        let h = self.h * s;
+        rect((outer.w - w) * 0.5, (outer.h - h) * 0.5, w, h)
+    }
+
+    #[inline]
+    pub fn conflate(&self, r: &Self) -> Self {
+        let x = self.min_x().min(r.min_x());
+        let y = self.min_y().min(r.min_y());
+        let w = self.max_x().max(r.max_x());
+        let h = self.max_y().max(r.max_y());
+        rect(x, y, w - x, h - y)
+    }
+
+    #[inline]
+    pub fn translate(&self, amount: Vec2) -> Self {
+        rect(self.x + amount.x, self.y + amount.y, self.w, self.h)
+    }
+
+    #[inline]
+    pub fn inflate(&self, w: f32, h: f32) -> Self {
+        rect(self.x - w * 0.5, self.y - h * 0.5, self.w + w, self.h + h)
+    }
+
+    #[inline]
+    pub fn non_neg(&self) -> Self {
+        let mut r = *self;
+        if r.w < 0.0 {
+            r.x += r.w;
+            r.w = -r.w;
+        }
+        if r.h < 0.0 {
+            r.y += r.h;
+            r.h = -r.h;
+        }
+        r
+    }
+}
+
+impl AsRef<[f32]> for Rect {
+    fn as_ref(&self) -> &[f32] {
+        unsafe { std::slice::from_raw_parts(self as *const Self as *const f32, 4) }
+    }
+}
+
+impl fmt::Display for Rect {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}, {}, {}, {}", self.x, self.y, self.w, self.h)
+    }
+}
+
+impl Hash for Rect {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_i32(crate::hash_f32(self.x));
+        state.write_i32(crate::hash_f32(self.y));
+        state.write_i32(crate::hash_f32(self.w));
+        state.write_i32(crate::hash_f32(self.h));
+    }
+}
+
+impl From<(f32, f32, f32, f32)> for Rect {
+    fn from(val: (f32, f32, f32, f32)) -> Self {
+        rect(val.0, val.1, val.2, val.3)
+    }
+}
+
+impl From<Rect> for (f32, f32, f32, f32) {
+    fn from(val: Rect) -> Self {
+        (val.x, val.y, val.w, val.h)
+    }
+}
+
+impl Add<Vec2> for Rect {
+    type Output = Self;
+    fn add(self, val: Vec2) -> Rect {
+        rect(self.x + val.x, self.y + val.y, self.w, self.h)
+    }
+}
+
+impl Sub<Vec2> for Rect {
+    type Output = Self;
+    fn sub(self, val: Vec2) -> Rect {
+        rect(self.x - val.x, self.y - val.y, self.w, self.h)
+    }
+}
+
+impl Mul<f32> for Rect {
+    type Output = Self;
+    fn mul(self, val: f32) -> Self {
+        rect(self.x * val, self.y * val, self.w * val, self.h * val)
+    }
+}
+
+impl Div<f32> for Rect {
+    type Output = Self;
+    fn div(self, val: f32) -> Self {
+        rect(self.x / val, self.y / val, self.w / val, self.h / val)
+    }
+}
