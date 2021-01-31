@@ -1,4 +1,4 @@
-use crate::{vec2, Vec2};
+use crate::{vec2, IntRect, Vec2};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Sub};
@@ -258,6 +258,12 @@ impl From<(f32, f32, f32, f32)> for Rect {
 impl From<Rect> for (f32, f32, f32, f32) {
     fn from(val: Rect) -> Self {
         (val.x, val.y, val.w, val.h)
+    }
+}
+
+impl From<IntRect> for Rect {
+    fn from(val: IntRect) -> Self {
+        rect(val.x as f32, val.y as f32, val.w as f32, val.h as f32)
     }
 }
 
