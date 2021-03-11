@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
+use std::fmt::{Display, Formatter};
 use std::hash::Hash;
 use std::ops::{Add, Div, Mul, Sub};
-use std::fmt::{Display, Formatter};
 
 #[repr(C)]
 #[derive(Default, Copy, Clone, Debug, Eq, PartialEq, Hash)]

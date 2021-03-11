@@ -3,7 +3,7 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Default, Copy, Clone, Debug, PartialEq)]
+#[derive(Default, Copy, Clone, Debug)]
 #[repr(C)]
 pub struct Rect {
     pub x: f32,
@@ -237,6 +237,12 @@ impl AsRef<[f32]> for Rect {
 impl fmt::Display for Rect {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}, {}, {}, {}", self.x, self.y, self.w, self.h)
+    }
+}
+
+impl PartialEq for Rect {
+    fn eq(&self, other: &Self) -> bool {
+        self.x.eq(&other.x) && self.y.eq(&other.y) && self.w.eq(&other.w) && self.h.eq(&other.h)
     }
 }
 

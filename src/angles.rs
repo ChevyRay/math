@@ -2,11 +2,11 @@ use std::f32::consts::PI;
 use std::hash::{Hash, Hasher};
 
 #[repr(C)]
-#[derive(Default, Copy, Clone, PartialEq, PartialOrd)]
+#[derive(Default, Copy, Clone, PartialOrd)]
 pub struct Radians(pub f32);
 
 #[repr(C)]
-#[derive(Default, Copy, Clone, PartialEq, PartialOrd)]
+#[derive(Default, Copy, Clone, PartialOrd)]
 pub struct Degrees(pub f32);
 
 #[inline]
@@ -61,9 +61,23 @@ impl Degrees {
     }
 }
 
+impl PartialEq for Radians {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.eq(&other.0)
+    }
+}
+
 impl Hash for Radians {
     fn hash<H: Hasher>(&self, state: &mut H) {
         state.write_i32(crate::hash_f32(self.0));
+    }
+}
+
+impl PartialEq for Degrees {
+    fn eq(&self, other: &Self) -> bool {
+        let a: Radians = (*self).into();
+        let b: Radians = (*other).into();
+        a.eq(&b)
     }
 }
 

@@ -47,7 +47,7 @@ impl IntRect {
     /// Return a version of the rectangle that is guaranteed not to have a negative size.
     #[inline]
     pub fn absolute(&self) -> Self {
-        let mut r = self.clone();
+        let mut r = *self;
         if r.w < 0 {
             r.x += r.w;
             r.w = -r.w;
@@ -198,8 +198,8 @@ impl IntRect {
     #[inline]
     pub fn clamp_point(&self, p: Int2) -> Int2 {
         int2(
-            crate::clamp(p.x, self.min_x(), self.max_x()),
-            crate::clamp(p.y, self.min_y(), self.max_y()),
+            p.x.clamp(self.min_x(), self.max_x()),
+            p.y.clamp(self.min_y(), self.max_y()),
         )
     }
 

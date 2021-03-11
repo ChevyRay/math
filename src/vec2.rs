@@ -2,7 +2,7 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-#[derive(Default, Copy, Clone, Debug, PartialEq)]
+#[derive(Default, Copy, Clone, Debug)]
 #[repr(C)]
 pub struct Vec2 {
     pub x: f32,
@@ -14,6 +14,7 @@ pub fn vec2(x: f32, y: f32) -> Vec2 {
     Vec2 { x, y }
 }
 
+#[allow(clippy::len_without_is_empty)]
 impl Vec2 {
     pub const ZERO: Self = Self { x: 0.0, y: 0.0 };
     pub const ONE: Self = Self { x: 1.0, y: 1.0 };
@@ -208,6 +209,12 @@ impl Vec2 {
 impl AsRef<[f32]> for Vec2 {
     fn as_ref(&self) -> &[f32] {
         unsafe { std::slice::from_raw_parts(self as *const Self as *const f32, 2) }
+    }
+}
+
+impl PartialEq for Vec2 {
+    fn eq(&self, other: &Self) -> bool {
+        self.x.eq(&other.x) && self.y.eq(&other.y)
     }
 }
 

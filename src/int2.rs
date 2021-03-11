@@ -1,6 +1,6 @@
 use std::fmt;
 use std::hash::Hash;
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Default, Copy, Clone, Debug, PartialEq, Hash)]
 #[repr(C)]
@@ -122,12 +122,27 @@ impl Add<Int2> for Int2 {
         int2(self.x + other.x, self.y + other.y)
     }
 }
+impl AddAssign<Int2> for Int2 {
+    #[inline]
+    fn add_assign(&mut self, other: Int2) {
+        self.x += other.x;
+        self.y += other.y;
+    }
+}
 
 impl Sub<Int2> for Int2 {
     type Output = Self;
     #[inline]
     fn sub(self, other: Self) -> Self {
         int2(self.x - other.x, self.y - other.y)
+    }
+}
+
+impl SubAssign<Int2> for Int2 {
+    #[inline]
+    fn sub_assign(&mut self, other: Int2) {
+        self.x -= other.x;
+        self.y -= other.y;
     }
 }
 
@@ -147,11 +162,27 @@ impl Mul<Int2> for i32 {
     }
 }
 
+impl MulAssign<i32> for Int2 {
+    #[inline]
+    fn mul_assign(&mut self, other: i32) {
+        self.x += other;
+        self.y += other;
+    }
+}
+
 impl Mul<Int2> for Int2 {
     type Output = Self;
     #[inline]
     fn mul(self, other: Self) -> Self {
         int2(self.x * other.x, self.y * other.y)
+    }
+}
+
+impl MulAssign<Int2> for Int2 {
+    #[inline]
+    fn mul_assign(&mut self, other: Int2) {
+        self.x *= other.x;
+        self.y *= other.y;
     }
 }
 
@@ -163,10 +194,26 @@ impl Div<i32> for Int2 {
     }
 }
 
+impl DivAssign<i32> for Int2 {
+    #[inline]
+    fn div_assign(&mut self, other: i32) {
+        self.x /= other;
+        self.y /= other;
+    }
+}
+
 impl Div<Int2> for Int2 {
     type Output = Self;
     #[inline]
     fn div(self, other: Self) -> Self {
         int2(self.x / other.x, self.y / other.y)
+    }
+}
+
+impl DivAssign<Int2> for Int2 {
+    #[inline]
+    fn div_assign(&mut self, other: Int2) {
+        self.x /= other.x;
+        self.y /= other.y;
     }
 }

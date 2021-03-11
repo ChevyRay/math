@@ -2,7 +2,7 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-#[derive(Default, Copy, Clone, Debug, PartialEq)]
+#[derive(Default, Copy, Clone, Debug)]
 #[repr(C)]
 pub struct Vec4 {
     pub x: f32,
@@ -16,6 +16,7 @@ pub fn vec4(x: f32, y: f32, z: f32, w: f32) -> Vec4 {
     Vec4 { x, y, z, w }
 }
 
+#[allow(clippy::len_without_is_empty)]
 impl Vec4 {
     pub const ZERO: Self = Self {
         x: 0.0,
@@ -83,12 +84,12 @@ impl Vec4 {
 
     #[inline]
     pub fn floor(&self) -> Self {
-        vec4(self.x.floor(), self.y.floor(), self.z.abs(), self.w.abs())
+        vec4(self.x.floor(), self.y.floor(), self.z.floor(), self.w.floor())
     }
 
     #[inline]
     pub fn ceil(&self) -> Self {
-        vec4(self.x.ceil(), self.y.ceil(), self.z.ceil(), self.w.abs())
+        vec4(self.x.ceil(), self.y.ceil(), self.z.ceil(), self.w.ceil())
     }
 
     #[inline]
@@ -209,6 +210,12 @@ impl Vec4 {
 impl AsRef<[f32]> for Vec4 {
     fn as_ref(&self) -> &[f32] {
         unsafe { std::slice::from_raw_parts(self as *const Self as *const f32, 4) }
+    }
+}
+
+impl PartialEq for Vec4 {
+    fn eq(&self, other: &Self) -> bool {
+        self.x.eq(&other.x) && self.y.eq(&other.y) && self.z.eq(&other.z) && self.w.eq(&other.w)
     }
 }
 

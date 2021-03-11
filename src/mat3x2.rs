@@ -3,7 +3,7 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::Mul;
 
-#[derive(Default, Clone, Debug, PartialEq)]
+#[derive(Default, Clone, Debug)]
 #[repr(C)]
 pub struct Mat3x2 {
     pub m: [f32; 6],
@@ -106,6 +106,12 @@ impl Mat3x2 {
 impl AsRef<[f32]> for Mat3x2 {
     fn as_ref(&self) -> &[f32] {
         &self.m
+    }
+}
+
+impl PartialEq for Mat3x2 {
+    fn eq(&self, other: &Self) -> bool {
+        self.m.eq(&other.m)
     }
 }
 

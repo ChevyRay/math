@@ -2,7 +2,7 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-#[derive(Default, Copy, Clone, Debug, PartialEq)]
+#[derive(Default, Copy, Clone, Debug)]
 #[repr(C)]
 pub struct Vec3 {
     pub x: f32,
@@ -15,6 +15,7 @@ pub fn vec3(x: f32, y: f32, z: f32) -> Vec3 {
     Vec3 { x, y, z }
 }
 
+#[allow(clippy::len_without_is_empty)]
 impl Vec3 {
     pub const ZERO: Self = Self {
         x: 0.0,
@@ -110,7 +111,7 @@ impl Vec3 {
 
     #[inline]
     pub fn floor(&self) -> Self {
-        vec3(self.x.floor(), self.y.floor(), self.z.abs())
+        vec3(self.x.floor(), self.y.floor(), self.z.floor())
     }
 
     #[inline]
@@ -236,6 +237,12 @@ impl Vec3 {
 impl AsRef<[f32]> for Vec3 {
     fn as_ref(&self) -> &[f32] {
         unsafe { std::slice::from_raw_parts(self as *const Self as *const f32, 3) }
+    }
+}
+
+impl PartialEq for Vec3 {
+    fn eq(&self, other: &Self) -> bool {
+        self.x.eq(&other.x) && self.y.eq(&other.y) && self.z.eq(&other.z)
     }
 }
 

@@ -14,23 +14,19 @@ pub fn rad_to_deg(rad: f32) -> f32 {
 
 #[inline]
 pub fn sign(x: f32) -> f32 {
-    if x > 0.0 {
-        1.0
-    } else if x < 0.0 {
-        -1.0
-    } else {
-        0.0
+    match x {
+        _ if x > 0.0 => 1.0,
+        _ if x < 0.0 => -1.0,
+        _ => 0.0,
     }
 }
 
 #[inline]
 pub fn sign_i32(x: i32) -> i32 {
-    if x > 0 {
-        1
-    } else if x < 0 {
-        -1
-    } else {
-        0
+    match x {
+        _ if x > 0 => 1,
+        _ if x < 0 => -1,
+        _ => 0,
     }
 }
 
@@ -92,7 +88,7 @@ pub fn hash_f32(val: f32) -> i32 {
     }
 }
 
-#[inline]
+/*#[inline]
 pub fn clamp<T: Ord>(val: T, min: T, max: T) -> T {
     std::cmp::min(std::cmp::max(val, min), max)
-}
+}*/
