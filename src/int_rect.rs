@@ -210,8 +210,8 @@ impl IntRect {
 
     #[inline]
     pub fn overlap(&self, r: &Self) -> Option<Self> {
-        let min = self.top_left().max(r.top_left());
-        let max = self.bottom_right().min(r.bottom_right());
+        let min = self.min().max(r.min());
+        let max = self.max().min(r.max());
         if max.x > min.x && max.y > min.y {
             Some(irect(min.x, min.y, max.x - min.x, max.y - min.y))
         } else {
