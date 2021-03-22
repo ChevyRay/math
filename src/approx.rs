@@ -1,3 +1,4 @@
+/// Check if two f32's are approximately equal.
 #[inline]
 pub fn approx_f32(a: f32, b: f32) -> bool {
     approx::abs_diff_eq!(a, b)
@@ -27,6 +28,7 @@ where
     A: AsRef<[f32]>,
     B: AsRef<[f32]>,
 {
+    /// Check if the two values are approximately equal.
     #[inline]
     fn approx(&self, other: &B) -> bool {
         let a = self.as_ref();

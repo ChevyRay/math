@@ -2,7 +2,9 @@ use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::hash::Hash;
 use std::ops::{Add, Div, Mul, Sub};
+use crate::Degrees;
 
+/// A 32-bit RGBA color, with 8-bits per channel.
 #[repr(C)]
 #[derive(Default, Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Color {
@@ -13,60 +15,70 @@ pub struct Color {
 }
 
 impl Color {
+    /// 0x00000000
     pub const TRANSPARENT: Self = Self {
         r: 0,
         g: 0,
         b: 0,
         a: 0,
     };
+    /// 0x000000ff
     pub const BLACK: Self = Self {
         r: 0,
         g: 0,
         b: 0,
         a: 255,
     };
+    /// 0xffffffff
     pub const WHITE: Self = Self {
         r: 255,
         g: 255,
         b: 255,
         a: 255,
     };
+    /// 0xff0000ff
     pub const RED: Self = Self {
         r: 255,
         g: 0,
         b: 0,
         a: 255,
     };
+    /// 0x00ff00ff
     pub const GREEN: Self = Self {
         r: 0,
         g: 255,
         b: 0,
         a: 255,
     };
+    /// 0x0000ffff
     pub const BLUE: Self = Self {
         r: 0,
         g: 0,
         b: 255,
         a: 255,
     };
+    /// 0xffff00ff
     pub const YELLOW: Self = Self {
         r: 255,
         g: 255,
         b: 0,
         a: 255,
     };
+    /// 0x00ffffff
     pub const CYAN: Self = Self {
         r: 0,
         g: 255,
         b: 255,
         a: 255,
     };
+    /// 0xff00ffff
     pub const FUCHSIA: Self = Self {
         r: 255,
         g: 0,
         b: 255,
         a: 255,
     };
+    /// 0x808080ff
     pub const GREY: Self = Self {
         r: 128,
         g: 128,
@@ -74,26 +86,31 @@ impl Color {
         a: 255,
     };
 
+    /// Construct a color from RGBA components.
     #[inline]
     pub fn rgba(r: u8, g: u8, b: u8, a: u8) -> Self {
         Self { r, g, b, a }
     }
 
+    /// Construct a fully-opaque color from RGB components.
     #[inline]
     pub fn rgb(r: u8, g: u8, b: u8) -> Self {
         Self::rgba(r, g, b, 255)
     }
 
+    /// Construct a color from an RGBA hexadecimal code (eg. `0x00ff00ff` for bright green).
     #[inline]
     pub fn new(hex: u32) -> Self {
         hex.into()
     }
 
+    /// Pack the color into an RGBA hexadecimal value.
     #[inline]
     pub fn packed(self) -> u32 {
         self.into()
     }
 
+    /// Construct a color from RGBA floating-point components in range (0.0 - 1.0).
     #[inline]
     pub fn rgba_f32(r: f32, g: f32, b: f32, a: f32) -> Self {
         Self {
@@ -104,14 +121,16 @@ impl Color {
         }
     }
 
+    /// Construct a fully-opaque color from RGB floating-point components in range (0.0 - 1.0).
     #[inline]
     pub fn rgb_f32(r: f32, g: f32, b: f32) -> Self {
         Self::rgba_f32(r, g, b, 1.0)
     }
 
+    /// Construct a fully-saturated color from a radial hue.
     #[inline]
-    pub fn hue(deg: f32) -> Self {
-        let mut h = deg % 360.0;
+    pub fn hue<A: Into<Degrees>>(a: A) -> Self {
+        let mut h = a.into().0 % 360.0;
         if h < 0.0 {
             h += 360.0
         }
@@ -130,6 +149,10 @@ impl Color {
         }
     }
 
+    /// Linearly interpolate between two colors by a factor `t`.
+    ///
+    /// **NOTE:** the resulting RGBA components are truncated into u8 values,
+    /// so this cannot be treated as an equivalent to [Vec4::lerp()](struct.Vec4.html#method.lerp).
     #[inline]
     pub fn lerp(self, to: Self, t: f32) -> Self {
         Self {
@@ -140,6 +163,7 @@ impl Color {
         }
     }
 
+    /// Retrieve the RGBA components as floating-point values in range (0.0 - 1.0).
     #[inline]
     pub fn floats(self) -> (f32, f32, f32, f32) {
         (

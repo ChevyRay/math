@@ -1,19 +1,23 @@
 use std::f32::consts::PI;
 use std::hash::{Hash, Hasher};
 
+/// An angle in radians.
 #[repr(C)]
 #[derive(Default, Copy, Clone, PartialOrd)]
 pub struct Radians(pub f32);
 
+/// An angle in degrees.
 #[repr(C)]
 #[derive(Default, Copy, Clone, PartialOrd)]
 pub struct Degrees(pub f32);
 
+/// Construct an angle in radians.
 #[inline]
 pub fn rad(val: f32) -> Radians {
     Radians(val)
 }
 
+/// Construct an angle in degrees.
 #[inline]
 pub fn deg(val: f32) -> Degrees {
     Degrees(val)
@@ -48,6 +52,7 @@ impl From<Radians> for f32 {
 }
 
 impl Radians {
+    /// Check if two angles are approximately equal.
     #[inline]
     pub fn approx<T: Into<Radians>>(self, other: T) -> bool {
         crate::approx_f32(self.0, other.into().0)
@@ -55,6 +60,7 @@ impl Radians {
 }
 
 impl Degrees {
+    /// Check if two angles are approximately equal.
     #[inline]
     pub fn approx<T: Into<Radians>>(self, other: T) -> bool {
         other.into().approx(self)
