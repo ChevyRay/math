@@ -31,7 +31,7 @@ pub use color::Color;
 pub use helper::*;
 pub use int2::{int2, Int2};
 pub use int3::{int3, Int3};
-pub use int_rect::{irect, IntRect};
+pub use int_rect::{irect, IntRect, IntRectIter};
 pub use mat3x2::{mat3x2, Mat3x2};
 pub use mat4x4::{mat4x4, Mat4x4};
 pub use rect::{rect, Rect};
