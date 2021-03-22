@@ -319,7 +319,7 @@ impl Iterator for IntRectIter {
             let p = self.pos;
             self.pos.x += 1;
             if self.pos.x >= self.max_x {
-                self.pos.x = min_x;
+                self.pos.x = self.min_x;
                 self.pos.y += 1;
             }
             Some(p)
