@@ -261,12 +261,26 @@ impl IntRect {
     }
 
     #[inline]
-    pub fn points(&self) -> IntRectPoints {
-        let r = self.absolute();
-        IntRectPoints {
-            p: r.top_left(),
-            size: r.size(),
-            left: r.left(),
+    pub fn iter(&self) -> IntRectIter {
+        IntRectIter {
+            min_x: self.min_x(),
+            max_x: self.max_x(),
+            max_y: self.max_y(),
+            pos: Int2::ZERO,
+        }
+    }
+}
+
+impl IntoIterator for IntRect {
+    type Item = Int2;
+    type IntoIter = IntRectIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IntRectIter {
+            min_x: self.min_x(),
+            max_x: self.max_x(),
+            max_y: self.max_y(),
+            pos: Int2::ZERO,
         }
     }
 }
@@ -291,21 +305,22 @@ impl Sub<Int2> for IntRect {
     }
 }
 
-pub struct IntRectPoints {
-    p: Int2,
-    size: Int2,
-    left: i32,
+pub struct IntRectIter {
+    min_x: i32,
+    max_x: i32,
+    max_y: i32,
+    pos: Int2,
 }
 
-impl Iterator for IntRectPoints {
+impl Iterator for IntRectIter {
     type Item = Int2;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.p.y < self.size.y {
-            let p = self.p;
-            self.p.x += 1;
-            if self.p.x == self.left + self.size.x {
-                self.p.x = self.left;
-                self.p.y += 1;
+        if self.pos.y < self.max_y {
+            let p = self.pos;
+            self.pos.x += 1;
+            if self.pos.x >= self.max_x {
+                self.pos.x = min_x;
+                self.pos.y += 1;
             }
             Some(p)
         } else {
