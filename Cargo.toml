@@ -11,4 +11,9 @@ default = ["serde"]
 
 [dependencies]
 approx = "^0.4.0"
-serde = {version = "1.0.124", optional = true, default-features = false, features = ["derive"]}
+
+[dependencies.serde]
+version = "1.0.124"
+optional = true
+default-features = false
+features = ["derive"]
