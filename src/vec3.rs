@@ -1,6 +1,6 @@
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub, Rem, RemAssign, AddAssign, SubAssign, MulAssign, DivAssign};
 use crate::{Vec2, Vec4};
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
@@ -330,6 +330,12 @@ impl Add<Vec3> for Vec3 {
     }
 }
 
+impl AddAssign<Vec3> for Vec3 {
+    fn add_assign(&mut self, rhs: Vec3) {
+        *self = self.add(rhs);
+    }
+}
+
 impl Sub<Vec3> for Vec3 {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
@@ -337,10 +343,22 @@ impl Sub<Vec3> for Vec3 {
     }
 }
 
+impl SubAssign<Vec3> for Vec3 {
+    fn sub_assign(&mut self, rhs: Vec3) {
+        *self = self.sub(rhs);
+    }
+}
+
 impl Mul<f32> for Vec3 {
     type Output = Self;
     fn mul(self, n: f32) -> Self {
         vec3(self.x * n, self.y * n, self.z * n)
+    }
+}
+
+impl MulAssign<f32> for Vec3 {
+    fn mul_assign(&mut self, rhs: f32) {
+        *self = self.mul(rhs);
     }
 }
 
@@ -358,6 +376,12 @@ impl Mul<Vec3> for Vec3 {
     }
 }
 
+impl MulAssign<Vec3> for Vec3 {
+    fn mul_assign(&mut self, rhs: Vec3) {
+        *self = self.mul(rhs);
+    }
+}
+
 impl Div<f32> for Vec3 {
     type Output = Self;
     fn div(self, n: f32) -> Self {
@@ -369,5 +393,37 @@ impl Div<Vec3> for Vec3 {
     type Output = Self;
     fn div(self, other: Self) -> Self {
         vec3(self.x / other.x, self.y / other.y, self.z / other.z)
+    }
+}
+
+impl DivAssign<Vec3> for Vec3 {
+    fn div_assign(&mut self, rhs: Vec3) {
+        *self = self.div(rhs);
+    }
+}
+
+impl Rem<Vec3> for Vec3 {
+    type Output = Vec3;
+    fn rem(self, rhs: Vec3) -> Self::Output {
+        vec3(self.x % rhs.x, self.y % rhs.y, self.z % rhs.z)
+    }
+}
+
+impl RemAssign<Vec3> for Vec3 {
+    fn rem_assign(&mut self, rhs: Vec3) {
+        *self = self.rem(rhs);
+    }
+}
+
+impl Rem<f32> for Vec3 {
+    type Output = Vec3;
+    fn rem(self, rhs: f32) -> Self::Output {
+        vec3(self.x % rhs, self.y % rhs, self.z % rhs)
+    }
+}
+
+impl RemAssign<f32> for Vec3 {
+    fn rem_assign(&mut self, rhs: f32) {
+        *self = self.rem(rhs);
     }
 }

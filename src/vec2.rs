@@ -1,6 +1,6 @@
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Div, Mul, Neg, Sub, AddAssign, SubAssign, MulAssign, DivAssign};
+use std::ops::{Add, Div, Mul, Neg, Sub, AddAssign, SubAssign, MulAssign, DivAssign, Rem, RemAssign};
 use crate::{Radians, Vec3};
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
@@ -362,5 +362,31 @@ impl Div<Vec2> for Vec2 {
 impl DivAssign<Vec2> for Vec2 {
     fn div_assign(&mut self, rhs: Vec2) {
         *self = self.div(rhs);
+    }
+}
+
+impl Rem<Vec2> for Vec2 {
+    type Output = Vec2;
+    fn rem(self, rhs: Vec2) -> Self::Output {
+        vec2(self.x % rhs.x, self.y % rhs.y)
+    }
+}
+
+impl RemAssign<Vec2> for Vec2 {
+    fn rem_assign(&mut self, rhs: Vec2) {
+        *self = self.rem(rhs);
+    }
+}
+
+impl Rem<f32> for Vec2 {
+    type Output = Vec2;
+    fn rem(self, rhs: f32) -> Self::Output {
+        vec2(self.x % rhs, self.y % rhs)
+    }
+}
+
+impl RemAssign<f32> for Vec2 {
+    fn rem_assign(&mut self, rhs: f32) {
+        *self = self.rem(rhs);
     }
 }

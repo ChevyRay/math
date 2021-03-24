@@ -1,7 +1,7 @@
 use crate::{vec2, IntRect, Vec2};
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Div, Mul, Sub, AddAssign};
+use std::ops::{Add, Div, Mul, Sub, AddAssign, SubAssign, MulAssign, DivAssign};
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
 
@@ -259,6 +259,12 @@ impl Sub<Vec2> for Rect {
     }
 }
 
+impl SubAssign<Vec2> for Rect {
+    fn sub_assign(&mut self, rhs: Vec2) {
+        *self = self.sub(rhs);
+    }
+}
+
 impl Mul<f32> for Rect {
     type Output = Self;
     fn mul(self, val: f32) -> Self {
@@ -266,9 +272,21 @@ impl Mul<f32> for Rect {
     }
 }
 
+impl MulAssign<f32> for Rect {
+    fn mul_assign(&mut self, rhs: f32) {
+        *self = self.mul(rhs);
+    }
+}
+
 impl Div<f32> for Rect {
     type Output = Self;
     fn div(self, val: f32) -> Self {
         rect(self.x / val, self.y / val, self.w / val, self.h / val)
+    }
+}
+
+impl DivAssign<f32> for Rect {
+    fn div_assign(&mut self, rhs: f32) {
+        *self = self.div(rhs);
     }
 }
