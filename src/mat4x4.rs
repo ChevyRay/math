@@ -1,7 +1,7 @@
 use crate::{vec2, vec3, vec4, Radians, Vec2, Vec3, Vec4};
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Mul, MulAssign};
+use std::ops::{Mul, MulAssign, Index};
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
 
@@ -333,6 +333,13 @@ impl Mat4x4 {
 impl AsRef<[f32]> for Mat4x4 {
     fn as_ref(&self) -> &[f32] {
         &self.m
+    }
+}
+
+impl Index<usize> for Mat4x4 {
+    type Output = f32;
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.as_ref()[index]
     }
 }
 

@@ -1,6 +1,6 @@
 use std::fmt;
 use std::hash::Hash;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Rem, RemAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Rem, RemAssign, Index};
 
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
@@ -77,6 +77,19 @@ impl Int2 {
 impl fmt::Display for Int2 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}, {}", self.x, self.y)
+    }
+}
+
+impl AsRef<[i32]> for Int2 {
+    fn as_ref(&self) -> &[i32] {
+        unsafe { std::slice::from_raw_parts(self as *const Self as *const i32, 2) }
+    }
+}
+
+impl Index<usize> for Int2 {
+    type Output = i32;
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.as_ref()[index]
     }
 }
 

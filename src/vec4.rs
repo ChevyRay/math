@@ -1,6 +1,6 @@
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Div, Mul, Neg, Sub, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign, Rem};
+use std::ops::{Add, Div, Mul, Neg, Sub, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign, Rem, Index};
 use crate::Vec3;
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
@@ -218,6 +218,13 @@ impl Vec4 {
 impl AsRef<[f32]> for Vec4 {
     fn as_ref(&self) -> &[f32] {
         unsafe { std::slice::from_raw_parts(self as *const Self as *const f32, 4) }
+    }
+}
+
+impl Index<usize> for Vec4 {
+    type Output = f32;
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.as_ref()[index]
     }
 }
 

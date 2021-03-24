@@ -1,7 +1,7 @@
 use crate::{vec2, Vec2};
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Mul, MulAssign};
+use std::ops::{Mul, MulAssign, Index};
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
 
@@ -101,6 +101,13 @@ impl AsRef<[f32]> for Mat3x2 {
     }
 }
 
+impl Index<usize> for Mat3x2 {
+    type Output = f32;
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.as_ref()[index]
+    }
+}
+
 impl PartialEq for Mat3x2 {
     fn eq(&self, other: &Self) -> bool {
         self.m.eq(&other.m)
@@ -124,6 +131,8 @@ impl fmt::Display for Mat3x2 {
         )
     }
 }
+
+
 
 impl Mul<Mat3x2> for Mat3x2 {
     type Output = Mat3x2;
