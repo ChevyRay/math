@@ -4,7 +4,7 @@ use serde::de::{Error, Visitor};
 use serde::{Serializer, Deserializer, Serialize, Deserialize};
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, BitAnd, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
+use std::ops::{Add, AddAssign, BitAnd, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Rem, RemAssign, Index};
 
 /// A 32-bit RGBA color, with 8-bits per channel.
 #[repr(C)]
@@ -89,25 +89,21 @@ impl Color {
     };
 
     /// Construct a color from RGBA components.
-    #[inline]
     pub fn rgba(r: u8, g: u8, b: u8, a: u8) -> Self {
         Self { r, g, b, a }
     }
 
     /// Construct a fully-opaque color from RGB components.
-    #[inline]
     pub fn rgb(r: u8, g: u8, b: u8) -> Self {
         Self::rgba(r, g, b, 255)
     }
 
     /// Pack the color into an RGBA hexadecimal value.
-    #[inline]
     pub fn packed(self) -> u32 {
         self.into()
     }
 
     /// Construct a color from RGBA floating-point components in range (0.0 - 1.0).
-    #[inline]
     pub fn rgba_f32(r: f32, g: f32, b: f32, a: f32) -> Self {
         Self {
             r: (r * 255.0) as u8,
@@ -118,13 +114,11 @@ impl Color {
     }
 
     /// Construct a fully-opaque color from RGB floating-point components in range (0.0 - 1.0).
-    #[inline]
     pub fn rgb_f32(r: f32, g: f32, b: f32) -> Self {
         Self::rgba_f32(r, g, b, 1.0)
     }
 
     /// Construct a fully-saturated color from a radial hue.
-    #[inline]
     pub fn hue<A: Into<Degrees>>(a: A) -> Self {
         let mut h = a.into().0 % 360.0;
         if h < 0.0 {
@@ -149,7 +143,6 @@ impl Color {
     ///
     /// **NOTE:** the resulting RGBA components are truncated into u8 values,
     /// so this cannot be treated as an equivalent to [Vec4::lerp()](struct.Vec4.html#method.lerp).
-    #[inline]
     pub fn lerp(self, to: Self, t: f32) -> Self {
         Self {
             r: crate::lerp(self.r as f32, to.r as f32, t) as u8,
@@ -163,7 +156,6 @@ impl Color {
     ///
     /// **NOTE:** the resulting RGBA components are truncated into u8 values,
     /// so this cannot be treated as an equivalent to [Vec4::bezier3()](struct.Vec4.html#method.bezier3).
-    #[inline]
     pub fn bezier3(self, b: Self, c: Self, t: f32) -> Self {
         Self {
             r: crate::bezier3(self.r as f32, b.r as f32, c.r as f32, t) as u8,
@@ -177,7 +169,6 @@ impl Color {
     ///
     /// **NOTE:** the resulting RGBA components are truncated into u8 values,
     /// so this cannot be treated as an equivalent to [Vec4::bezier4()](struct.Vec4.html#method.bezier4).
-    #[inline]
     pub fn bezier4(self, b: Self, c: Self, d: Self, t: f32) -> Self {
         Self {
             r: crate::bezier4(self.r as f32, b.r as f32, c.r as f32, d.r as f32, t) as u8,
@@ -188,7 +179,6 @@ impl Color {
     }
 
     /// Retrieve the RGBA components as floating-point values in range (0.0 - 1.0).
-    #[inline]
     pub fn floats(self) -> (f32, f32, f32, f32) {
         (
             (self.r as f32) / 255.0,
@@ -218,8 +208,16 @@ impl Ord for Color {
     }
 }
 
+impl Index<usize> for Color {
+    type Output = u8;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        assert!(index < 4);
+        &self.as_ref()[index]
+    }
+}
+
 impl From<u32> for Color {
-    #[inline]
     fn from(val: u32) -> Self {
         Self {
             r: (val >> 24) as u8,
@@ -231,7 +229,6 @@ impl From<u32> for Color {
 }
 
 impl From<Color> for u32 {
-    #[inline]
     fn from(val: Color) -> Self {
         (val.r as u32) << 24 | (val.g as u32) << 16 | (val.b as u32) << 8 | (val.a as u32)
     }
@@ -281,7 +278,6 @@ impl AsRef<[u8]> for Color {
 
 impl Add<Color> for Color {
     type Output = Self;
-    #[inline]
     fn add(self, other: Self) -> Self {
         Self::rgba(
             self.r.saturating_add(other.r),
@@ -293,7 +289,6 @@ impl Add<Color> for Color {
 }
 
 impl AddAssign<Color> for Color {
-    #[inline]
     fn add_assign(&mut self, rhs: Color) {
         *self = *self + rhs;
     }
@@ -301,7 +296,6 @@ impl AddAssign<Color> for Color {
 
 impl Sub<Color> for Color {
     type Output = Self;
-    #[inline]
     fn sub(self, other: Self) -> Self {
         Self::rgba(
             self.r.saturating_sub(other.r),
@@ -313,7 +307,6 @@ impl Sub<Color> for Color {
 }
 
 impl SubAssign<Color> for Color {
-    #[inline]
     fn sub_assign(&mut self, rhs: Color) {
         *self = *self - rhs;
     }
@@ -321,7 +314,6 @@ impl SubAssign<Color> for Color {
 
 impl Mul<Color> for Color {
     type Output = Self;
-    #[inline]
     fn mul(self, other: Self) -> Self {
         let (r1, g1, b1, a1) = self.floats();
         let (r2, g2, b2, a2) = other.floats();
@@ -330,7 +322,6 @@ impl Mul<Color> for Color {
 }
 
 impl MulAssign<Color> for Color {
-    #[inline]
     fn mul_assign(&mut self, rhs: Color) {
         *self = *self * rhs;
     }
@@ -338,7 +329,6 @@ impl MulAssign<Color> for Color {
 
 impl Mul<f32> for Color {
     type Output = Self;
-    #[inline]
     fn mul(self, n: f32) -> Self {
         let (r, g, b, a) = self.floats();
         Self::rgba_f32(r * n, g * n, b * n, a * n)
@@ -346,7 +336,6 @@ impl Mul<f32> for Color {
 }
 
 impl MulAssign<f32> for Color {
-    #[inline]
     fn mul_assign(&mut self, rhs: f32) {
         *self = *self * rhs;
     }
@@ -354,7 +343,6 @@ impl MulAssign<f32> for Color {
 
 impl Mul<Color> for f32 {
     type Output = Color;
-    #[inline]
     fn mul(self, color: Color) -> Color {
         let (r, g, b, a) = color.floats();
         Color::rgba_f32(r * self, g * self, b * self, a * self)
@@ -363,7 +351,6 @@ impl Mul<Color> for f32 {
 
 impl Div<Color> for Color {
     type Output = Self;
-    #[inline]
     fn div(self, other: Self) -> Self {
         let (r1, g1, b1, a1) = self.floats();
         let (r2, g2, b2, a2) = other.floats();
@@ -372,7 +359,6 @@ impl Div<Color> for Color {
 }
 
 impl DivAssign<Color> for Color {
-    #[inline]
     fn div_assign(&mut self, rhs: Color) {
         *self = *self / rhs;
     }
@@ -380,7 +366,6 @@ impl DivAssign<Color> for Color {
 
 impl Div<f32> for Color {
     type Output = Self;
-    #[inline]
     fn div(self, n: f32) -> Self {
         let (r, g, b, a) = self.floats();
         Self::rgba_f32(r / n, g / n, b / n, a / n)
@@ -388,7 +373,6 @@ impl Div<f32> for Color {
 }
 
 impl DivAssign<f32> for Color {
-    #[inline]
     fn div_assign(&mut self, rhs: f32) {
         *self = *self / rhs;
     }
@@ -396,14 +380,12 @@ impl DivAssign<f32> for Color {
 
 impl BitAnd<Color> for Color {
     type Output = Self;
-    #[inline]
     fn bitand(self, rhs: Color) -> Self::Output {
         Color::from(self.packed().bitand(rhs.packed()))
     }
 }
 
 impl BitAndAssign<Color> for Color {
-    #[inline]
     fn bitand_assign(&mut self, rhs: Color) {
         *self = self.bitand(rhs);
     }
@@ -411,14 +393,12 @@ impl BitAndAssign<Color> for Color {
 
 impl BitOr<Color> for Color {
     type Output = Color;
-    #[inline]
     fn bitor(self, rhs: Color) -> Self::Output {
         Color::from(self.packed().bitor(rhs.packed()))
     }
 }
 
 impl BitOrAssign<Color> for Color {
-    #[inline]
     fn bitor_assign(&mut self, rhs: Color) {
         *self = self.bitor(rhs);
     }
@@ -426,16 +406,50 @@ impl BitOrAssign<Color> for Color {
 
 impl BitXor<Color> for Color {
     type Output = Color;
-    #[inline]
     fn bitxor(self, rhs: Color) -> Self::Output {
         Color::from(self.packed().bitxor(rhs.packed()))
     }
 }
 
 impl BitXorAssign<Color> for Color {
-    #[inline]
     fn bitxor_assign(&mut self, rhs: Color) {
         *self = self.bitxor(rhs);
+    }
+}
+
+impl Rem<Color> for Color {
+    type Output = Color;
+    fn rem(self, rhs: Color) -> Self::Output {
+        Color::rgba(
+            self.r % rhs.r,
+            self.g % rhs.g,
+            self.b % rhs.b,
+            self.a % rhs.a,
+        )
+    }
+}
+
+impl RemAssign<Color> for Color {
+    fn rem_assign(&mut self, rhs: Color) {
+        *self = self.rem(rhs);
+    }
+}
+
+impl Rem<u8> for Color {
+    type Output = Color;
+    fn rem(self, rhs: u8) -> Self::Output {
+        Color::rgba(
+            self.r % rhs,
+            self.g % rhs,
+            self.b % rhs,
+            self.a % rhs,
+        )
+    }
+}
+
+impl RemAssign<u8> for Color {
+    fn rem_assign(&mut self, rhs: u8) {
+        *self = self.rem(rhs);
     }
 }
 

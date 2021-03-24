@@ -1,7 +1,7 @@
 use crate::{vec2, vec3, vec4, Radians, Vec2, Vec3, Vec4};
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::Mul;
+use std::ops::{Mul, MulAssign};
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
 
@@ -12,7 +12,6 @@ pub struct Mat4x4 {
     pub m: [f32; 16],
 }
 
-#[inline]
 pub fn mat4x4(m: [f32; 16]) -> Mat4x4 {
     Mat4x4 { m }
 }
@@ -29,12 +28,10 @@ impl Mat4x4 {
         ],
     };
 
-    #[inline]
     pub fn new(m: [f32; 16]) -> Self {
         Self { m }
     }
 
-    #[inline]
     pub fn translation(amount: Vec3) -> Self {
         let (x, y, z) = amount.into();
         mat4x4([
@@ -42,7 +39,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn scale(scale: Vec3) -> Self {
         let (x, y, z) = scale.into();
         mat4x4([
@@ -50,7 +46,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn rotation_x<A: Into<Radians>>(radians: A) -> Self {
         let a = radians.into().0;
         let c = a.cos();
@@ -60,7 +55,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn rotation_y<A: Into<Radians>>(radians: A) -> Self {
         let a = radians.into().0;
         let c = a.cos();
@@ -70,7 +64,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn rotation_z<A: Into<Radians>>(radians: A) -> Self {
         let a = radians.into().0;
         let c = a.cos();
@@ -80,7 +73,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn orthographic(
         left: f32,
         right: f32,
@@ -109,7 +101,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn rotation_axis<A: Into<Radians>>(axis: Vec3, angle: A) -> Self {
         let (x, y, z) = axis.into();
         let a = angle.into().0;
@@ -141,7 +132,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn look_at(eye: Vec3, target: Vec3, up: Vec3) -> Self {
         let a = target - eye;
         let b = up.cross(a).norm();
@@ -166,7 +156,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn perspective(width: f32, height: f32, near_z: f32, far_z: f32) -> Self {
         mat4x4([
             (2.0 * near_z) / width,
@@ -188,7 +177,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn perspective_fov(fov: f32, aspect_ratio: f32, near_z: f32, far_z: f32) -> Self {
         let num = 1.0 / (fov * 0.5).tan();
         let num9 = num / aspect_ratio;
@@ -212,7 +200,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn transform4(&self, p: &Vec4) -> Vec4 {
         let m = &self.m;
         vec4(
@@ -223,7 +210,6 @@ impl Mat4x4 {
         )
     }
 
-    #[inline]
     pub fn transform4_dir(&self, p: &Vec4) -> Vec4 {
         let m = &self.m;
         vec4(
@@ -234,7 +220,6 @@ impl Mat4x4 {
         )
     }
 
-    #[inline]
     pub fn transform3(&self, p: &Vec3) -> Vec3 {
         let m = &self.m;
         vec3(
@@ -244,7 +229,6 @@ impl Mat4x4 {
         )
     }
 
-    #[inline]
     pub fn transform3_dir(&self, p: &Vec3) -> Vec3 {
         let m = &self.m;
         vec3(
@@ -254,7 +238,6 @@ impl Mat4x4 {
         )
     }
 
-    #[inline]
     pub fn transform2(&self, p: Vec2) -> Vec2 {
         let m = &self.m;
         vec2(
@@ -263,13 +246,11 @@ impl Mat4x4 {
         )
     }
 
-    #[inline]
     pub fn transform2_dir(&self, p: Vec2) -> Vec2 {
         let m = &self.m;
         vec2(p.x * m[0] + p.y * m[4], p.x * m[1] + p.y * m[5])
     }
 
-    #[inline]
     pub fn invert(&self) -> Self {
         let m = &self.m;
         let b0 = m[8] * m[13] - m[9] * m[12];
@@ -325,7 +306,6 @@ impl Mat4x4 {
         ])
     }
 
-    #[inline]
     pub fn mult(&self, other: &Self) -> Self {
         let a = &self.m;
         let b = &other.m;
@@ -398,8 +378,13 @@ impl fmt::Display for Mat4x4 {
 
 impl Mul<Mat4x4> for Mat4x4 {
     type Output = Mat4x4;
-    #[inline]
     fn mul(self, other: Mat4x4) -> Mat4x4 {
         self.mult(&other)
+    }
+}
+
+impl MulAssign<Mat4x4> for Mat4x4 {
+    fn mul_assign(&mut self, rhs: Mat4x4) {
+        *self = self.clone().mul(rhs);
     }
 }

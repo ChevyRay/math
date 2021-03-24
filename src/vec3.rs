@@ -16,7 +16,6 @@ pub struct Vec3 {
 }
 
 /// Easy constructor.
-#[inline]
 pub fn vec3(x: f32, y: f32, z: f32) -> Vec3 {
     Vec3 { x, y, z }
 }
@@ -73,86 +72,72 @@ impl Vec3 {
     };
 
     /// Create a new vector.
-    #[inline]
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         vec3(x, y, z)
     }
 
     /// Extend this vector with a w-axis.
-    #[inline]
     pub fn extend(&self, w: f32) -> Vec4 {
         crate::vec4(self.x, self.y, self.z, w)
     }
 
     /// Compose a new vector from a `Vec2` and the provided `z` axis.
-    #[inline]
     pub fn from(val: Vec2, z: f32) -> Self {
         vec3(val.x, val.y, z)
     }
 
     /// The length of the vector, squared.
-    #[inline]
     pub fn sqr_len(&self) -> f32 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     /// The euclidean length of the vector.
-    #[inline]
     pub fn len(&self) -> f32 {
         self.sqr_len().sqrt()
     }
 
     /// Normalize the vector.
-    #[inline]
     pub fn norm(&self) -> Self {
         let len = self.len();
         vec3(self.x / len, self.y / len, self.z / len)
     }
 
     /// Zero the vector's y and z axes.
-    #[inline]
     pub fn only_x(&self) -> Self {
         vec3(self.x, 0.0, 0.0)
     }
 
     /// Zero the vector's x and z axes.
-    #[inline]
     pub fn only_y(&self) -> Self {
         vec3(0.0, self.y, 0.0)
     }
 
     /// Zero the vector's x and y axes.
-    #[inline]
     pub fn only_z(&self) -> Self {
         vec3(0.0, 0.0, self.z)
     }
 
     /// Absolute the vector's components.
-    #[inline]
     pub fn abs(&self) -> Self {
         vec3(self.x.abs(), self.y.abs(), self.z.abs())
     }
 
     /// Round the vector's components down.
-    #[inline]
     pub fn floor(&self) -> Self {
         vec3(self.x.floor(), self.y.floor(), self.z.floor())
     }
 
     /// Round the vector's components up.
-    #[inline]
     pub fn ceil(&self) -> Self {
         vec3(self.x.ceil(), self.y.ceil(), self.z.ceil())
     }
 
     /// Round the vector's components.
-    #[inline]
     pub fn round(&self) -> Self {
         vec3(self.x.round(), self.y.round(), self.z.round())
     }
 
     /// Return the minimum of the vector's components.
-    #[inline]
     pub fn min(&self, other: Self) -> Self {
         vec3(
             self.x.min(other.x),
@@ -162,7 +147,6 @@ impl Vec3 {
     }
 
     /// Return the maximum of the vector's components.
-    #[inline]
     pub fn max(&self, other: Self) -> Self {
         vec3(
             self.x.max(other.x),
@@ -172,7 +156,6 @@ impl Vec3 {
     }
 
     /// Return the sign of the vector's components.
-    #[inline]
     pub fn sign(&self) -> Self {
         vec3(
             crate::sign(self.x),
@@ -182,19 +165,16 @@ impl Vec3 {
     }
 
     /// Return a vector with its components clamped in the provided range.
-    #[inline]
     pub fn clamp(&self, min: Self, max: Self) -> Self {
         self.max(min).min(max)
     }
 
     /// Return the dot product of two vectors.
-    #[inline]
     pub fn dot(&self, other: Self) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
     /// Return the cross product of two vectors.
-    #[inline]
     pub fn cross(&self, other: Self) -> Self {
         vec3(
             self.y * other.z - self.z * other.y,
@@ -204,7 +184,6 @@ impl Vec3 {
     }
 
     /// Get the square distance between two vectors.
-    #[inline]
     pub fn sqr_dist(&self, other: Self) -> f32 {
         let x = self.x - other.x;
         let y = self.y - other.y;
@@ -213,14 +192,12 @@ impl Vec3 {
     }
 
     /// Get the euclidean distance between two vectors.
-    #[inline]
     pub fn dist(&self, other: Self) -> f32 {
         self.sqr_dist(other).sqrt()
     }
 
     /// Linear interpolation between two vectors by a factor `t`.
     /// For example, `t = 0.5` would return the midpoint between the two vectors.
-    #[inline]
     pub fn lerp(&self, other: Self, t: f32) -> Self {
         vec3(
             crate::lerp(self.x, other.x, t),
@@ -230,7 +207,6 @@ impl Vec3 {
     }
 
     /// Quadratic bezier interpolation by a factor `t`, using `b` as the anchor point.
-    #[inline]
     pub fn bezier3(&self, b: Self, c: Self, t: f32) -> Self {
         vec3(
             crate::bezier3(self.x, b.x, c.x, t),
@@ -240,7 +216,6 @@ impl Vec3 {
     }
 
     /// Cubic bezier interpolation by a factor `t`, using `b` and `c` as the anchor points.
-    #[inline]
     pub fn bezier4(&self, b: Self, c: Self, d: Self, t: f32) -> Self {
         vec3(
             crate::bezier4(self.x, b.x, c.x, d.x, t),
@@ -250,7 +225,6 @@ impl Vec3 {
     }
 
     /// Catmull-Rom interpolation by a factor `t`, using `b` and `c` as the anchor points.
-    #[inline]
     pub fn catmull_rom(&self, b: Self, c: Self, d: Self, t: f32) -> Self {
         vec3(
             crate::catmull_rom(self.x, b.x, c.x, d.x, t),
@@ -260,7 +234,6 @@ impl Vec3 {
     }
 
     /// Hermite interpolation by a factor `t` using the provided tangents.
-    #[inline]
     pub fn hermite(&self, self_tangent: Self, other: Self, other_tangent: Self, t: f32) -> Self {
         vec3(
             crate::hermite(self.x, self_tangent.x, other.x, other_tangent.x, t),
@@ -270,7 +243,6 @@ impl Vec3 {
     }
 
     /// Smooth-step interpolation between vectors by factor `t`.
-    #[inline]
     pub fn smooth_step(&self, target: Self, t: f32) -> Self {
         self.lerp(target, crate::smooth_step(t))
     }
@@ -346,7 +318,6 @@ impl From<Vec3> for (f32, f32, f32) {
 
 impl Neg for Vec3 {
     type Output = Self;
-    #[inline]
     fn neg(self) -> Self {
         vec3(-self.x, -self.y, -self.z)
     }
@@ -354,7 +325,6 @@ impl Neg for Vec3 {
 
 impl Add<Vec3> for Vec3 {
     type Output = Self;
-    #[inline]
     fn add(self, other: Self) -> Self {
         vec3(self.x + other.x, self.y + other.y, self.z + other.z)
     }
@@ -362,7 +332,6 @@ impl Add<Vec3> for Vec3 {
 
 impl Sub<Vec3> for Vec3 {
     type Output = Self;
-    #[inline]
     fn sub(self, other: Self) -> Self {
         vec3(self.x - other.x, self.y - other.y, self.z - other.z)
     }
@@ -370,7 +339,6 @@ impl Sub<Vec3> for Vec3 {
 
 impl Mul<f32> for Vec3 {
     type Output = Self;
-    #[inline]
     fn mul(self, n: f32) -> Self {
         vec3(self.x * n, self.y * n, self.z * n)
     }
@@ -378,7 +346,6 @@ impl Mul<f32> for Vec3 {
 
 impl Mul<Vec3> for f32 {
     type Output = Vec3;
-    #[inline]
     fn mul(self, v: Vec3) -> Vec3 {
         vec3(v.x * self, v.y * self, v.z * self)
     }
@@ -386,7 +353,6 @@ impl Mul<Vec3> for f32 {
 
 impl Mul<Vec3> for Vec3 {
     type Output = Self;
-    #[inline]
     fn mul(self, other: Self) -> Self {
         vec3(self.x * other.x, self.y * other.y, self.z * other.z)
     }
@@ -394,7 +360,6 @@ impl Mul<Vec3> for Vec3 {
 
 impl Div<f32> for Vec3 {
     type Output = Self;
-    #[inline]
     fn div(self, n: f32) -> Self {
         vec3(self.x / n, self.y / n, self.z / n)
     }
@@ -402,7 +367,6 @@ impl Div<f32> for Vec3 {
 
 impl Div<Vec3> for Vec3 {
     type Output = Self;
-    #[inline]
     fn div(self, other: Self) -> Self {
         vec3(self.x / other.x, self.y / other.y, self.z / other.z)
     }

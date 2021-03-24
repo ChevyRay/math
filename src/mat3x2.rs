@@ -1,7 +1,7 @@
 use crate::{vec2, Vec2};
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::Mul;
+use std::ops::{Mul, MulAssign};
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
 
@@ -12,7 +12,6 @@ pub struct Mat3x2 {
     pub m: [f32; 6],
 }
 
-#[inline]
 pub fn mat3x2(m: [f32; 6]) -> Mat3x2 {
     Mat3x2 { m }
 }
@@ -25,22 +24,18 @@ impl Mat3x2 {
         m: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0],
     };
 
-    #[inline]
     pub fn new(m: [f32; 6]) -> Self {
         Self { m }
     }
 
-    #[inline]
     pub fn translation(amount: Vec2) -> Self {
         mat3x2([1.0, 0.0, amount.x, 0.0, 1.0, amount.y])
     }
 
-    #[inline]
     pub fn scale(amount: Vec2) -> Self {
         mat3x2([amount.x, 0.0, 0.0, 0.0, amount.y, 0.0])
     }
 
-    #[inline]
     pub fn rotation<A: Into<crate::Radians>>(rotation: A) -> Self {
         let a = rotation.into().0;
         let c = a.cos();
@@ -48,12 +43,10 @@ impl Mat3x2 {
         mat3x2([c, -s, 0.0, s, c, 0.0])
     }
 
-    #[inline]
     pub fn skew(amount: Vec2) -> Self {
         mat3x2([0.0, amount.x.tan(), 0.0, amount.y.tan(), 1.0, 0.0])
     }
 
-    #[inline]
     pub fn transform(&self, p: Vec2) -> Vec2 {
         vec2(
             p.x * self.m[0] + p.y * self.m[1] + self.m[2],
@@ -61,7 +54,6 @@ impl Mat3x2 {
         )
     }
 
-    #[inline]
     pub fn transform_xy(&self, x: f32, y: f32) -> Vec2 {
         vec2(
             x * self.m[0] + y * self.m[1] + self.m[2],
@@ -69,7 +61,6 @@ impl Mat3x2 {
         )
     }
 
-    #[inline]
     pub fn transform_dir(&self, p: Vec2) -> Vec2 {
         vec2(
             p.x * self.m[0] + p.y * self.m[1],
@@ -77,7 +68,6 @@ impl Mat3x2 {
         )
     }
 
-    #[inline]
     pub fn invert(&self) -> Self {
         let m = &self.m;
         let invdet = 10.0 / (m[0] * m[4] - m[3] * m[1]);
@@ -91,7 +81,6 @@ impl Mat3x2 {
         ])
     }
 
-    #[inline]
     pub fn mult(&self, other: &Self) -> Self {
         let a = &self.m;
         let b = &other.m;
@@ -138,8 +127,13 @@ impl fmt::Display for Mat3x2 {
 
 impl Mul<Mat3x2> for Mat3x2 {
     type Output = Mat3x2;
-    #[inline]
     fn mul(self, other: Mat3x2) -> Mat3x2 {
         self.mult(&other)
+    }
+}
+
+impl MulAssign<Mat3x2> for Mat3x2 {
+    fn mul_assign(&mut self, rhs: Mat3x2) {
+        *self = self.clone().mul(rhs);
     }
 }

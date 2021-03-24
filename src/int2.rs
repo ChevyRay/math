@@ -1,6 +1,6 @@
 use std::fmt;
 use std::hash::Hash;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Rem, RemAssign};
 
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
@@ -13,7 +13,6 @@ pub struct Int2 {
     pub y: i32,
 }
 
-#[inline]
 pub fn int2(x: i32, y: i32) -> Int2 {
     Int2 { x, y }
 }
@@ -26,62 +25,50 @@ impl Int2 {
     pub const DOWN: Self = Self { x: 0, y: 1 };
     pub const UP: Self = Self { x: 0, y: -1 };
 
-    #[inline]
     pub fn new(x: i32, y: i32) -> Self {
         int2(x, y)
     }
 
-    #[inline]
     pub fn xy_len(&self) -> i32 {
         self.x.abs() + self.y.abs()
     }
 
-    #[inline]
     pub fn turn_left(&self) -> Self {
         int2(self.y, -self.x)
     }
 
-    #[inline]
     pub fn turn_right(&self) -> Self {
         int2(-self.y, self.x)
     }
 
-    #[inline]
     pub fn only_x(&self) -> Self {
         int2(self.x, 0)
     }
 
-    #[inline]
     pub fn only_y(&self) -> Self {
         int2(0, self.y)
     }
 
-    #[inline]
     pub fn abs(&self) -> Self {
         int2(self.x.abs(), self.y.abs())
     }
 
-    #[inline]
     pub fn min(&self, other: Self) -> Self {
         int2(self.x.min(other.x), self.y.min(other.y))
     }
 
-    #[inline]
     pub fn max(&self, other: Self) -> Self {
         int2(self.x.max(other.x), self.y.max(other.y))
     }
 
-    #[inline]
     pub fn sign(&self) -> Self {
         int2(crate::sign_i32(self.x), crate::sign_i32(self.y))
     }
 
-    #[inline]
     pub fn clamp(&self, min: Self, max: Self) -> Self {
         self.max(min).min(max)
     }
 
-    #[inline]
     pub fn xy_dist(&self, other: Self) -> i32 {
         (self.x - other.x).abs() + (self.y - other.y).abs()
     }
@@ -113,7 +100,6 @@ impl From<Int2> for (i32, i32) {
 
 impl Neg for Int2 {
     type Output = Self;
-    #[inline]
     fn neg(self) -> Self {
         int2(-self.x, -self.y)
     }
@@ -121,38 +107,31 @@ impl Neg for Int2 {
 
 impl Add<Int2> for Int2 {
     type Output = Self;
-    #[inline]
     fn add(self, other: Self) -> Self {
         int2(self.x + other.x, self.y + other.y)
     }
 }
 impl AddAssign<Int2> for Int2 {
-    #[inline]
     fn add_assign(&mut self, other: Int2) {
-        self.x += other.x;
-        self.y += other.y;
+        *self = self.add(other);
     }
 }
 
 impl Sub<Int2> for Int2 {
     type Output = Self;
-    #[inline]
     fn sub(self, other: Self) -> Self {
         int2(self.x - other.x, self.y - other.y)
     }
 }
 
 impl SubAssign<Int2> for Int2 {
-    #[inline]
     fn sub_assign(&mut self, other: Int2) {
-        self.x -= other.x;
-        self.y -= other.y;
+        *self = self.sub(other);
     }
 }
 
 impl Mul<i32> for Int2 {
     type Output = Self;
-    #[inline]
     fn mul(self, n: i32) -> Self {
         int2(self.x * n, self.y * n)
     }
@@ -160,64 +139,78 @@ impl Mul<i32> for Int2 {
 
 impl Mul<Int2> for i32 {
     type Output = Int2;
-    #[inline]
     fn mul(self, v: Int2) -> Int2 {
         int2(v.x * self, v.y * self)
     }
 }
 
 impl MulAssign<i32> for Int2 {
-    #[inline]
     fn mul_assign(&mut self, other: i32) {
-        self.x += other;
-        self.y += other;
+        *self = self.mul(other);
     }
 }
 
 impl Mul<Int2> for Int2 {
     type Output = Self;
-    #[inline]
     fn mul(self, other: Self) -> Self {
         int2(self.x * other.x, self.y * other.y)
     }
 }
 
 impl MulAssign<Int2> for Int2 {
-    #[inline]
     fn mul_assign(&mut self, other: Int2) {
-        self.x *= other.x;
-        self.y *= other.y;
+        *self = self.mul(other);
     }
 }
 
 impl Div<i32> for Int2 {
     type Output = Self;
-    #[inline]
     fn div(self, n: i32) -> Self {
         int2(self.x / n, self.y / n)
     }
 }
 
 impl DivAssign<i32> for Int2 {
-    #[inline]
     fn div_assign(&mut self, other: i32) {
-        self.x /= other;
-        self.y /= other;
+        *self = self.div(other);
     }
 }
 
 impl Div<Int2> for Int2 {
     type Output = Self;
-    #[inline]
     fn div(self, other: Self) -> Self {
         int2(self.x / other.x, self.y / other.y)
     }
 }
 
 impl DivAssign<Int2> for Int2 {
-    #[inline]
     fn div_assign(&mut self, other: Int2) {
-        self.x /= other.x;
-        self.y /= other.y;
+        *self = self.div(other);
+    }
+}
+
+impl Rem<Int2> for Int2 {
+    type Output = Int2;
+    fn rem(self, rhs: Int2) -> Self::Output {
+        int2(self.x % rhs.x, self.y % rhs.y)
+    }
+}
+
+impl RemAssign<Int2> for Int2 {
+    fn rem_assign(&mut self, rhs: Int2) {
+        *self = self.rem(rhs);
+    }
+}
+
+impl Rem<i32> for Int2 {
+    type Output = Int2;
+    fn rem(self, rhs: i32) -> Self::Output {
+        int2(self.x % rhs, self.y % rhs)
+    }
+}
+
+impl RemAssign<i32> for Int2 {
+    fn rem_assign(&mut self, rhs: i32) {
+        *self = self.rem(rhs);
     }
 }

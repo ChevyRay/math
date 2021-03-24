@@ -15,41 +15,35 @@ pub struct Radians(pub f32);
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Degrees(pub f32);
 
-/// Construct an angle in radians.
-#[inline]
+/// Construct an angle in radians.    
 pub fn rad(val: f32) -> Radians {
     Radians(val)
 }
 
-/// Construct an angle in degrees.
-#[inline]
+/// Construct an angle in degrees.    
 pub fn deg(val: f32) -> Degrees {
     Degrees(val)
 }
 
-impl From<Degrees> for Radians {
-    #[inline]
+impl From<Degrees> for Radians {    
     fn from(val: Degrees) -> Self {
         Self(val.0 * (PI / 180.0))
     }
 }
 
 impl From<Radians> for Degrees {
-    #[inline]
     fn from(val: Radians) -> Self {
         Self(val.0 * (180.0 / PI))
     }
 }
 
 impl From<f32> for Radians {
-    #[inline]
     fn from(val: f32) -> Self {
         Self(val)
     }
 }
 
 impl From<Radians> for f32 {
-    #[inline]
     fn from(val: Radians) -> Self {
         val.0
     }
@@ -57,7 +51,6 @@ impl From<Radians> for f32 {
 
 impl Radians {
     /// Check if two angles are approximately equal.
-    #[inline]
     pub fn approx<T: Into<Radians>>(self, other: T) -> bool {
         crate::approx_f32(self.0, other.into().0)
     }
@@ -65,7 +58,6 @@ impl Radians {
 
 impl Degrees {
     /// Check if two angles are approximately equal.
-    #[inline]
     pub fn approx<T: Into<Radians>>(self, other: T) -> bool {
         other.into().approx(self)
     }
