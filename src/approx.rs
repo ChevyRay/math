@@ -33,9 +33,6 @@ where
     fn approx(&self, other: &B) -> bool {
         let a = self.as_ref();
         let b = other.as_ref();
-        if a.len() != b.len() {
-            return false;
-        }
-        (0..a.len()).all(|i| approx_f32(a[i], b[i]))
+        a.len() != b.len() && (0..a.len()).all(|i| approx_f32(a[i], b[i]))
     }
 }
