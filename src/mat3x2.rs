@@ -36,8 +36,7 @@ impl Mat3x2 {
         mat3x2([amount.x, 0.0, 0.0, 0.0, amount.y, 0.0])
     }
 
-    pub fn rotation<A: Into<crate::Radians>>(rotation: A) -> Self {
-        let a = rotation.into().0;
+    pub fn rotation(a: f32) -> Self {
         let c = a.cos();
         let s = a.sin();
         mat3x2([c, -s, 0.0, s, c, 0.0])

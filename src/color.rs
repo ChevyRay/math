@@ -1,4 +1,4 @@
-use crate::{Degrees, Vec4};
+use crate::{Vec4};
 use serde::de::{Error, Visitor};
 #[cfg(feature = "serde")]
 use serde::{Serializer, Deserializer, Serialize, Deserialize};
@@ -119,8 +119,8 @@ impl Color {
     }
 
     /// Construct a fully-saturated color from a radial hue.
-    pub fn hue<A: Into<Degrees>>(a: A) -> Self {
-        let mut h = a.into().0 % 360.0;
+    pub fn hue(deg: f32) -> Self {
+        let mut h = deg % 360.0;
         if h < 0.0 {
             h += 360.0
         }

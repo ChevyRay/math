@@ -1,6 +1,4 @@
 #[allow(clippy::many_single_char_names)]
-mod angles;
-#[allow(clippy::many_single_char_names)]
 mod approx;
 #[allow(clippy::many_single_char_names)]
 mod helper;
@@ -26,7 +24,6 @@ mod vec4;
 mod color;
 
 pub use crate::approx::{approx, approx_f32, Approx};
-pub use angles::{deg, rad, Degrees, Radians};
 pub use helper::*;
 pub use color::Color;
 pub use int2::{int2, Int2};

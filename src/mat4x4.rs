@@ -1,4 +1,4 @@
-use crate::{vec2, vec3, vec4, Radians, Vec2, Vec3, Vec4};
+use crate::{vec2, vec3, vec4, Vec2, Vec3, Vec4};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Mul, MulAssign, Index};
@@ -46,8 +46,7 @@ impl Mat4x4 {
         ])
     }
 
-    pub fn rotation_x<A: Into<Radians>>(radians: A) -> Self {
-        let a = radians.into().0;
+    pub fn rotation_x(a: f32) -> Self {
         let c = a.cos();
         let s = a.sin();
         mat4x4([
@@ -55,8 +54,7 @@ impl Mat4x4 {
         ])
     }
 
-    pub fn rotation_y<A: Into<Radians>>(radians: A) -> Self {
-        let a = radians.into().0;
+    pub fn rotation_y(a: f32) -> Self {
         let c = a.cos();
         let s = a.sin();
         mat4x4([
@@ -64,8 +62,7 @@ impl Mat4x4 {
         ])
     }
 
-    pub fn rotation_z<A: Into<Radians>>(radians: A) -> Self {
-        let a = radians.into().0;
+    pub fn rotation_z(a: f32) -> Self {
         let c = a.cos();
         let s = a.sin();
         mat4x4([
@@ -101,9 +98,8 @@ impl Mat4x4 {
         ])
     }
 
-    pub fn rotation_axis<A: Into<Radians>>(axis: Vec3, angle: A) -> Self {
+    pub fn rotation_axis(axis: Vec3, a: f32) -> Self {
         let (x, y, z) = axis.into();
-        let a = angle.into().0;
         let num2 = a.sin();
         let num = a.cos();
         let num11 = x * x;

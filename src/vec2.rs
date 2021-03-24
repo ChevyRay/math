@@ -1,7 +1,7 @@
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Neg, Sub, AddAssign, SubAssign, MulAssign, DivAssign, Rem, RemAssign, Index};
-use crate::{Radians, Vec3};
+use crate::{Vec3};
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
 
@@ -50,8 +50,7 @@ impl Vec2 {
     }
 
     /// Create a normalized directional vector from the supplied rotation.
-    pub fn polar<A: Into<Radians>>(rotation: A) -> Self {
-        let rad = rotation.into().0;
+    pub fn polar(rad: f32) -> Self {
         vec2(rad.cos(), rad.sin())
     }
 
@@ -66,8 +65,8 @@ impl Vec2 {
     }
 
     /// Get the angle of the vector in radians.
-    pub fn angle(&self) -> Radians {
-        Radians(self.y.atan2(self.x))
+    pub fn angle(&self) -> f32 {
+        self.y.atan2(self.x)
     }
 
     /// Barycentric coordinate.
