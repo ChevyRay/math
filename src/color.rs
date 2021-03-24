@@ -4,7 +4,7 @@ use serde::de::{Error, Visitor};
 use serde::{Serializer, Deserializer, Serialize, Deserialize};
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, BitAnd, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, BitAnd, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 
 /// A 32-bit RGBA color, with 8-bits per channel.
 #[repr(C)]
@@ -313,6 +313,7 @@ impl Sub<Color> for Color {
 }
 
 impl SubAssign<Color> for Color {
+    #[inline]
     fn sub_assign(&mut self, rhs: Color) {
         *self = *self - rhs;
     }
@@ -329,6 +330,7 @@ impl Mul<Color> for Color {
 }
 
 impl MulAssign<Color> for Color {
+    #[inline]
     fn mul_assign(&mut self, rhs: Color) {
         *self = *self * rhs;
     }
@@ -344,6 +346,7 @@ impl Mul<f32> for Color {
 }
 
 impl MulAssign<f32> for Color {
+    #[inline]
     fn mul_assign(&mut self, rhs: f32) {
         *self = *self * rhs;
     }
@@ -369,6 +372,7 @@ impl Div<Color> for Color {
 }
 
 impl DivAssign<Color> for Color {
+    #[inline]
     fn div_assign(&mut self, rhs: Color) {
         *self = *self / rhs;
     }
@@ -384,6 +388,7 @@ impl Div<f32> for Color {
 }
 
 impl DivAssign<f32> for Color {
+    #[inline]
     fn div_assign(&mut self, rhs: f32) {
         *self = *self / rhs;
     }
@@ -391,9 +396,46 @@ impl DivAssign<f32> for Color {
 
 impl BitAnd<Color> for Color {
     type Output = Self;
-
+    #[inline]
     fn bitand(self, rhs: Color) -> Self::Output {
-        Color::from(self.packed() | rhs.packed())
+        Color::from(self.packed().bitand(rhs.packed()))
+    }
+}
+
+impl BitAndAssign<Color> for Color {
+    #[inline]
+    fn bitand_assign(&mut self, rhs: Color) {
+        *self = self.bitand(rhs);
+    }
+}
+
+impl BitOr<Color> for Color {
+    type Output = Color;
+    #[inline]
+    fn bitor(self, rhs: Color) -> Self::Output {
+        Color::from(self.packed().bitor(rhs.packed()))
+    }
+}
+
+impl BitOrAssign<Color> for Color {
+    #[inline]
+    fn bitor_assign(&mut self, rhs: Color) {
+        *self = self.bitor(rhs);
+    }
+}
+
+impl BitXor<Color> for Color {
+    type Output = Color;
+    #[inline]
+    fn bitxor(self, rhs: Color) -> Self::Output {
+        Color::from(self.packed().bitxor(rhs.packed()))
+    }
+}
+
+impl BitXorAssign<Color> for Color {
+    #[inline]
+    fn bitxor_assign(&mut self, rhs: Color) {
+        *self = self.bitxor(rhs);
     }
 }
 
@@ -425,7 +467,7 @@ impl<'de> Visitor<'de> for ColorVisitor {
     type Value = Color;
 
     fn expecting(&self, formatter: &mut Formatter) -> std::fmt::Result {
-        formatter.write_str("a 32-bit integer")
+        formatter.write_str("an unsigned 32-bit integer")
     }
 
     fn visit_u32<E>(self, v: u32) -> Result<Self::Value, E>
