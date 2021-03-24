@@ -2,8 +2,11 @@ use crate::{int2, Int2};
 use std::fmt;
 use std::hash::Hash;
 use std::ops::{Add, Sub};
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
 
 #[derive(Default, Copy, Clone, Debug, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[repr(C)]
 pub struct IntRect {
     pub x: i32,

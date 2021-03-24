@@ -1,14 +1,18 @@
 use std::f32::consts::PI;
 use std::hash::{Hash, Hasher};
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
 
 /// An angle in radians.
 #[repr(C)]
 #[derive(Default, Copy, Clone, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Radians(pub f32);
 
 /// An angle in degrees.
 #[repr(C)]
 #[derive(Default, Copy, Clone, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Degrees(pub f32);
 
 /// Construct an angle in radians.

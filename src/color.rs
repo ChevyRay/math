@@ -1,8 +1,7 @@
 use crate::{Degrees, Vec4};
-use serde::de::{Error, Unexpected, Visitor};
-use serde::{Deserialize, Deserializer};
+use serde::de::{Error, Visitor};
 #[cfg(feature = "serde")]
-use serde::{Serialize, Serializer};
+use serde::{Serializer, Deserializer, Serialize, Deserialize};
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, BitAnd, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};

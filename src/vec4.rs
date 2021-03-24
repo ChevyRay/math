@@ -2,9 +2,12 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Neg, Sub};
 use crate::Vec3;
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
 
 /// A four-dimensional floating point vector.
 #[derive(Default, Copy, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[repr(C)]
 pub struct Vec4 {
     pub x: f32,

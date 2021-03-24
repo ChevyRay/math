@@ -2,8 +2,11 @@ use crate::{vec2, Vec2};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::Mul;
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
 
 #[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[repr(C)]
 pub struct Mat3x2 {
     pub m: [f32; 6],

@@ -2,8 +2,11 @@ use crate::{vec2, IntRect, Vec2};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Sub};
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
 
 #[derive(Default, Copy, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[repr(C)]
 pub struct Rect {
     pub x: f32,
