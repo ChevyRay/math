@@ -1,9 +1,9 @@
 use crate::{int2, Int2};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::hash::Hash;
-use std::ops::{Add, Sub, AddAssign, SubAssign};
-#[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize};
+use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 #[derive(Default, Copy, Clone, Debug, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -224,11 +224,12 @@ impl IntRect {
     }
 
     pub fn iter(&self) -> IntRectIter {
+        let pos = self.min();
         IntRectIter {
-            min_x: self.min_x(),
+            min_x: pos.x,
             max_x: self.max_x(),
             max_y: self.max_y(),
-            pos: Int2::ZERO,
+            pos,
         }
     }
 }
@@ -238,11 +239,12 @@ impl IntoIterator for IntRect {
     type IntoIter = IntRectIter;
 
     fn into_iter(self) -> Self::IntoIter {
+        let pos = self.min();
         IntRectIter {
-            min_x: self.min_x(),
+            min_x: pos.x,
             max_x: self.max_x(),
             max_y: self.max_y(),
-            pos: Int2::ZERO,
+            pos,
         }
     }
 }
@@ -289,7 +291,7 @@ pub struct IntRectIter {
 impl Iterator for IntRectIter {
     type Item = Int2;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.pos.y < self.max_y {
+        if self.pos.x < self.max_x && self.pos.y < self.max_y {
             let p = self.pos;
             self.pos.x += 1;
             if self.pos.x >= self.max_x {

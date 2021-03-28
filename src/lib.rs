@@ -1,6 +1,8 @@
 #[allow(clippy::many_single_char_names)]
 mod approx;
 #[allow(clippy::many_single_char_names)]
+mod color;
+#[allow(clippy::many_single_char_names)]
 mod helper;
 #[allow(clippy::many_single_char_names)]
 mod int2;
@@ -20,12 +22,10 @@ mod vec2;
 mod vec3;
 #[allow(clippy::many_single_char_names)]
 mod vec4;
-#[allow(clippy::many_single_char_names)]
-mod color;
 
 pub use crate::approx::{approx, approx_f32, Approx};
-pub use helper::*;
 pub use color::Color;
+pub use helper::*;
 pub use int2::{int2, Int2};
 pub use int3::{int3, Int3};
 pub use int_rect::{irect, IntRect, IntRectIter};

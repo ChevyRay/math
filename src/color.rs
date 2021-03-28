@@ -1,10 +1,13 @@
-use crate::{Vec4};
+use crate::Vec4;
 use serde::de::{Error, Visitor};
 #[cfg(feature = "serde")]
-use serde::{Serializer, Deserializer, Serialize, Deserialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, BitAnd, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Rem, RemAssign, Index};
+use std::ops::{
+    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
+    Index, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign,
+};
 
 /// A 32-bit RGBA color, with 8-bits per channel.
 #[repr(C)]
@@ -137,6 +140,185 @@ impl Color {
         } else {
             Self::rgb_f32(1.0, 0.0, 1.0 - (h - 300.0) / 60.0)
         }
+    }
+
+    /// Convert an HSV color to RGBA.
+    ///
+    /// `h`: hue in degrees
+    /// `s`: saturation (0 - 1)
+    /// `v`: value (0 - 1)
+    pub fn from_hsv(h: f32, s: f32, v: f32) -> Self {
+        let range = (h / 60.0) as u8;
+        let c = v * s;
+        let x = c * (1.0 - (((h / 60.0) % 2.0) - 1.0).abs());
+        let m = v - c;
+        match range {
+            0 => Self::rgb_f32((c + m) * 255.0, (x + m) * 255.0, m * 255.0),
+            1 => Self::rgb_f32((x + m) * 255.0, (c + m) * 255.0, m * 255.0),
+            2 => Self::rgb_f32(m * 255.0, (c + m) * 255.0, (x + m) * 255.0),
+            3 => Self::rgb_f32(m * 255.0, (x + m) * 255.0, (c + m) * 255.0),
+            4 => Self::rgb_f32((x + m) * 255.0, m * 255.0, (c + m) * 255.0),
+            _ => Self::rgb_f32((c + m) * 255.0, m * 255.0, (x + m) * 255.0),
+        }
+    }
+
+    /// Convert to hue-saturation-value color space.
+    pub fn to_hsv(&self) -> (f32, f32, f32) {
+        let (r, g, b, _) = self.floats();
+
+        let min = r.min(g.min(b));
+        let max = r.max(g.max(b));
+        let delta = max - min;
+
+        let v = max;
+        let s = match max > 1e-3 {
+            true => delta / max,
+            false => 0.0,
+        };
+
+        let h = match delta == 0.0 {
+            true => 0.0,
+            false => {
+                if r == max {
+                    (g - b) / delta
+                } else if g == max {
+                    2.0 + (b - r) / delta
+                } else {
+                    4.0 + (r - g) / delta
+                }
+            }
+        };
+        let h = ((h * 60.0) + 360.0) % 360.0;
+
+        (h, s, v)
+    }
+
+    /// Convert to [CIE 1931](https://en.wikipedia.org/wiki/CIE_1931_color_space) XYZ color space.
+    pub fn to_xyz(&self) -> (f32, f32, f32) {
+        fn comp(r: f32) -> f32 {
+            if r <= 0.04045 {
+                r / 12.92
+            } else {
+                ((r + 0.055) / 1.055).powf(2.4)
+            }
+        }
+        let (r, g, b, _) = self.floats();
+        let (r, g, b) = (comp(r), comp(g), comp(b));
+        (
+            (0.4124 * r + 0.3576 * g + 0.1805 * b) * 100.0,
+            (0.2126 * r + 0.7152 * g + 0.0722 * b) * 100.0,
+            (0.0193 * r + 0.1192 * g + 0.9505 * b) * 100.0,
+        )
+    }
+
+    /// Convert from [CIE 1931](https://en.wikipedia.org/wiki/CIE_1931_color_space) XYZ color space.
+    pub fn from_xyz(x: f32, y: f32, z: f32) -> Self {
+        let (x, y, z) = (x / 100.0, y / 100.0, z / 100.0);
+        let r = x * 3.2404542 + y * -1.5371385 + z * -0.4985314;
+        let g = x * -0.9692660 + y * 1.8760108 + z * 0.0415560;
+        let b = x * 0.0556434 + y * -0.2040259 + z * 1.0572252;
+        fn comp(r: f32) -> f32 {
+            if r > 0.0031308 {
+                1.055 * r.powf(1.0 / 2.4) - 0.055
+            } else {
+                12.92 * r
+            }
+        }
+        Self::rgb_f32(comp(r), comp(g), comp(b))
+    }
+
+    /// Convert to [OKLab](https://bottosson.github.io/posts/oklab) color space.
+    pub fn to_oklab(&self) -> (f32, f32, f32) {
+        fn comp(r: f32) -> f32 {
+            if r > 0.04045 {
+                ((r + 0.055) / 1.055).powf(2.4)
+            } else {
+                r / 12.92
+            }
+        }
+        let (r, g, b, _) = self.floats();
+        let (r, g, b) = (comp(r), comp(g), comp(b));
+        let l = (0.4121656120 * r + 0.5362752080 * g + 0.0514575653 * b).cbrt();
+        let m = (0.2118591070 * r + 0.6807189584 * g + 0.1074065790 * b).cbrt();
+        let s = (0.0883097947 * r + 0.2818474174 * g + 0.6302613616 * b).cbrt();
+        (
+            0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+            1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+            0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s,
+        )
+    }
+
+    /// Convert to [CIELAB](https://en.wikipedia.org/wiki/CIELAB_color_space) color space.
+    pub fn to_cielab(&self) -> (f32, f32, f32) {
+        let (x, y, z) = self.to_xyz();
+        let x = x / 95.047;
+        let y = y / 100.0;
+        let z = z / 108.883;
+        let x = if x > 0.008856 {
+            x.cbrt()
+        } else {
+            7.787 * x + 16.0 / 116.0
+        };
+        let y = if y > 0.008856 {
+            y.cbrt()
+        } else {
+            7.787 * y + 16.0 / 116.0
+        };
+        let z = if z > 0.008856 {
+            z.cbrt()
+        } else {
+            7.787 * z + 16.0 / 116.0
+        };
+        ((116.0 * y) - 16.0, 500.0 * (x - y), 200.0 * (y - z))
+    }
+
+    /// Convert from [CIELAB](https://en.wikipedia.org/wiki/CIELAB_color_space) color space.
+    pub fn from_cielab(l: f32, a: f32, b: f32) -> Self {
+        let y = (l + 16.0) / 116.0;
+        let x = a / 500.0 + y;
+        let z = y - b / 200.0;
+        let x3 = x.powf(3.0);
+        let y3 = y.powf(3.0);
+        let z3 = z.powf(3.0);
+        let x = 95.047
+            * if x3 > 0.008856 {
+                x3
+            } else {
+                (x - 16.0 / 116.0) / 7.787
+            };
+        let y = 100.0
+            * if y3 > 0.008856 {
+                y3
+            } else {
+                (y - 16.0 / 116.0) / 7.787
+            };
+        let z = 108.883
+            * if z3 > 0.008856 {
+                z3
+            } else {
+                (z - 16.0 / 116.0) / 7.787
+            };
+        Self::from_xyz(x, y, z)
+    }
+
+    /// Convert from [OKLab](https://bottosson.github.io/posts/oklab) color space.
+    pub fn from_oklab(l: f32, a: f32, b: f32) -> Self {
+        let (l, m, s) = (
+            (l + 0.3963377774 * a + 0.2158037573 * b).powf(3.0),
+            (l - 0.1055613458 * a - 0.0638541728 * b).powf(3.0),
+            (l - 0.0894841775 * a - 1.2914855480 * b).powf(3.0),
+        );
+        let r = 4.0767245293 * l - 3.3072168827 * m + 0.2307590544 * s;
+        let g = -1.2681437731 * l + 2.6093323231 * m - 0.3411344290 * s;
+        let b = -0.0041119885 * l - 0.7034763098 * m + 1.7068625689 * s;
+        fn comp(r: f32) -> f32 {
+            if r > 0.0031308 {
+                1.055 * r.powf(2.4) - 0.055
+            } else {
+                12.92 * r
+            }
+        }
+        Self::rgb_f32(comp(r), comp(g), comp(b))
     }
 
     /// Linearly interpolate between two colors by a factor `t`.
@@ -438,12 +620,7 @@ impl RemAssign<Color> for Color {
 impl Rem<u8> for Color {
     type Output = Color;
     fn rem(self, rhs: u8) -> Self::Output {
-        Color::rgba(
-            self.r % rhs,
-            self.g % rhs,
-            self.b % rhs,
-            self.a % rhs,
-        )
+        Color::rgba(self.r % rhs, self.g % rhs, self.b % rhs, self.a % rhs)
     }
 }
 
