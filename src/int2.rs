@@ -1,9 +1,11 @@
 use std::fmt;
 use std::hash::Hash;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Rem, RemAssign, Index};
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Index, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+};
 
 #[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Default, Copy, Clone, Debug, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -71,6 +73,14 @@ impl Int2 {
 
     pub fn xy_dist(&self, other: Self) -> i32 {
         (self.x - other.x).abs() + (self.y - other.y).abs()
+    }
+
+    pub fn dot(&self, other: Self) -> i32 {
+        self.x * other.x + self.y * other.y
+    }
+
+    pub fn cross(&self, other: Self) -> i32 {
+        self.x * other.y - self.y * other.x
     }
 }
 
